@@ -20,40 +20,42 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	    http
-	        .cors(cors -> cors.configurationSource(corsConfigurationSource())) 
-	        .csrf(csrf -> csrf.disable()) 
-	        .authorizeHttpRequests(auth -> auth
-	            .requestMatchers("/api/users/user").authenticated() 
-	            .requestMatchers("/api/**").permitAll() 
-	            .anyRequest().authenticated() 
-	        )
-	        .oauth2Login(oauth2 -> oauth2
-	            .loginPage("/login") 
-	            .defaultSuccessUrl("http://localhost:5173/pets", true) 
-	        )
-	        .logout(logout -> logout
-	            .logoutUrl("/api/users/logout") 
-	            .logoutSuccessHandler((request, response, authentication) -> {
-	                response.setStatus(HttpServletResponse.SC_OK); 
-	            })
-	        );
+		http
+				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+				.csrf(csrf -> csrf.disable())
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/uploads/**").permitAll()
 
-	    return http.build();
+						.requestMatchers("/api/users/user").authenticated()
+						.requestMatchers("/api/**").permitAll()
+						.anyRequest().authenticated()
+				)
+				.oauth2Login(oauth2 -> oauth2
+						.loginPage("http://localhost:5173/login")
+						.defaultSuccessUrl("http://localhost:5173/pets", true)
+				)
+				.logout(logout -> logout
+						.logoutUrl("/api/users/logout")
+						.logoutSuccessHandler((request, response, authentication) -> {
+							response.setStatus(HttpServletResponse.SC_OK);
+						})
+				);
+
+		return http.build();
 	}
 
 
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
-	    CorsConfiguration configuration = new CorsConfiguration();
-	    configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Origen del frontend
-	    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-	    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-	    configuration.setAllowCredentials(true); // Permite el envío de credenciales como cookies
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOriginPatterns(List.of("http://localhost:5173"));
+		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+		configuration.setAllowCredentials(true); // Permite el envío de credenciales como cookies
 
-	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	    source.registerCorsConfiguration("/**", configuration); 
-	    return source;
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
 	}
 
 }

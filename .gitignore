@@ -1,0 +1,28 @@
+# Archivos de entorno y configuración sensibles
+.env
+
+# Configuración de IDEs
+.idea/
+*.iml
+
+# Salidas de compilación de Gradle
+/build/
+.gradle/
+
+# Archivos de logs
+*.log
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de configuración de VSCode (si usas)
+.vscode/
+
+# Recursos subidos y archivos generados
+uploads/
+
+# Otros archivos temporales
+*.tmp
+*.swp
+*.swo
