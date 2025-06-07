@@ -78,12 +78,21 @@ public class PetController {
     }
 
     // Mascotas paginadas y ordenadas por fecha de creación descendente
+//    @GetMapping
+//    public Page<Pet> getAllPets(
+//            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+//    ) {
+//        return petService.getAllPets(pageable);
+//    }
     @GetMapping
     public Page<Pet> getAllPets(
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return petService.getAllPets(pageable);
+        Page<Pet> pets = petService.getAllPets(pageable);
+        pets.forEach(pet -> System.out.println("[DEBUG] Controller: " + pet.getName() + " | photoUrl: " + pet.getPhotoUrl()));
+        return pets;
     }
+
     @GetMapping("/search")
     public Page<Pet> searchPetsByName(
             @RequestParam String name,
@@ -128,7 +137,7 @@ public class PetController {
         List<Pet> pets = petService.getPetsByLocation(latitude, longitude);
         return new ResponseEntity<>(pets, HttpStatus.OK);
     }
-    //
+//
 //    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 //    public ResponseEntity<?> updatePet(
 //            @PathVariable UUID id,
@@ -158,46 +167,46 @@ public class PetController {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar la mascota");
 //        }
 //    }
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updatePet(
-            @PathVariable UUID id,
-            @RequestParam("name") String name,
-            @RequestParam("description") String description,
-            @RequestParam("latitude") Double latitude,
-            @RequestParam("longitude") Double longitude,
-            @RequestParam("isFound") Boolean isFound,
-            @RequestParam(value = "photo", required = false) MultipartFile photo,
-            @RequestParam("userEmail") String userEmail
-    ) {
-        // PRINTS para depuración
-        System.out.println("---- [PetController] updatePet ----");
-        System.out.println("id: " + id);
-        System.out.println("name: " + name);
-        System.out.println("description: " + description);
-        System.out.println("latitude: " + latitude);
-        System.out.println("longitude: " + longitude);
-        System.out.println("isFound: " + isFound);
-        System.out.println("photo: " + (photo != null ? photo.getOriginalFilename() : "null"));
-        System.out.println("userEmail: " + userEmail);
+@PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ResponseEntity<?> updatePet(
+        @PathVariable UUID id,
+        @RequestParam("name") String name,
+        @RequestParam("description") String description,
+        @RequestParam("latitude") Double latitude,
+        @RequestParam("longitude") Double longitude,
+        @RequestParam("isFound") Boolean isFound,
+        @RequestParam(value = "photo", required = false) MultipartFile photo,
+        @RequestParam("userEmail") String userEmail
+) {
+    // PRINTS para depuración
+    System.out.println("---- [PetController] updatePet ----");
+    System.out.println("id: " + id);
+    System.out.println("name: " + name);
+    System.out.println("description: " + description);
+    System.out.println("latitude: " + latitude);
+    System.out.println("longitude: " + longitude);
+    System.out.println("isFound: " + isFound);
+    System.out.println("photo: " + (photo != null ? photo.getOriginalFilename() : "null"));
+    System.out.println("userEmail: " + userEmail);
 
-        try {
-            String photoUrl = null;
-            if (photo != null && !photo.isEmpty()) {
-                String fileName = UUID.randomUUID().toString() + "_" + photo.getOriginalFilename();
-                Path filePath = Paths.get("uploads/" + fileName);
-                Files.write(filePath, photo.getBytes());
-                photoUrl = "http://localhost:8080/uploads/" + fileName;
-            }
-
-            Pet updatedPet = petService.updatePetFields(
-                    id, name, description, latitude, longitude, isFound, photoUrl, userEmail
-            );
-
-            return ResponseEntity.ok(updatedPet);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar la mascota");
+    try {
+        String photoUrl = null;
+        if (photo != null && !photo.isEmpty()) {
+            String fileName = UUID.randomUUID().toString() + "_" + photo.getOriginalFilename();
+            Path filePath = Paths.get("uploads/" + fileName);
+            Files.write(filePath, photo.getBytes());
+            photoUrl = "http://localhost:8080/uploads/" + fileName;
         }
+
+        Pet updatedPet = petService.updatePetFields(
+                id, name, description, latitude, longitude, isFound, photoUrl, userEmail
+        );
+
+        return ResponseEntity.ok(updatedPet);
+    } catch (IOException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar la mascota");
     }
+}
 
 
     @DeleteMapping("/{id}")

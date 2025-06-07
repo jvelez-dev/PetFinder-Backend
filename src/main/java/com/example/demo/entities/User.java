@@ -168,3 +168,4 @@ public class User {
 		this.deletedAt = deletedAt;
 	}
 }
+

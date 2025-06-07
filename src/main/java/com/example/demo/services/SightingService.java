@@ -110,4 +110,5 @@ public class SightingService {
         sighting.setDeletedAt(LocalDateTime.now());
         sightingRepository.save(sighting);
     }
+
 }
